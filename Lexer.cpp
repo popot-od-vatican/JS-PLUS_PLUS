@@ -35,7 +35,8 @@ static bool IsNumericString(const std::string& str)
 
 static bool IsArithmeticOperator(const char& op)
 {
-	if (op == '+' || op == '-' || op == '/' || op == '*' || op == '%' || op == '=' || op == '|' || op == '&' || op == '^')
+	if (op == '+' || op == '-' || op == '/' || op == '*' || op == '%' || op == '=' || op == '|' || op == '&' || op == '^' || op == '<' || op == '>' ||
+		op == '?')
 		return true;
 	return false;
 }
@@ -75,11 +76,14 @@ Lexer::Lexer()
 	keywordsTable["["] = 10;
 	keywordsTable["]"] = 11;
 	keywordsTable["let"] = 12;
-	//keywordsTable["\n"] = 13;
 	keywordsTable["print"] = 14;
 	keywordsTable[","] = 15;
 	keywordsTable[":"] = 16;
 	keywordsTable["endl"] = 17;
+	keywordsTable["str_literal"] = 18;
+	keywordsTable["for"] = 19;
+	keywordsTable["if"] = 20;
+	keywordsTable["else"] = 21;
 }
 
 Lexer::~Lexer() {}
@@ -129,6 +133,11 @@ std::vector<Token> Lexer::tokenize(const std::string& input)
 				tokens.push_back(createToken(prev, string_lit));
 				prev = "";
 				string_lit = 0;
+			}
+
+			if (keywordsTable.find(prev) != keywordsTable.end() && string_lit < 2) {
+				tokens.push_back(createToken(prev, string_lit));
+				prev = "";
 			}
 		}
 
@@ -192,14 +201,23 @@ std::ostream& operator << (std::ostream& os, const Token& rhs)
 		case TokenType::COMMA:
 			os << "COMMA";
 			break;
-		case TokenType::KEYEQUAL:
-			os << ":=";
+		case TokenType::COLON:
+			os << ":";
 			break;
 		case TokenType::ENDL:
 			os << "ENDL";
 			break;
 		case TokenType::STR_LITERAL:
 			os << "string_literal";
+			break;
+		case TokenType::FOR:
+			os << "keyword for";
+			break;
+		case TokenType::IF:
+			os << "keyword if";
+			break;
+		case TokenType::ELSE:
+			os << "keyword else";
 			break;
 		default:
 			os << "Invalid Token!";

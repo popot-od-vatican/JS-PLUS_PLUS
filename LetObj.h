@@ -62,6 +62,13 @@ private:
 		bool operator == (bool) const;
 		bool operator == (const std::vector<LetObj>&) const;
 
+		bool operator < (const LetObj& rhs) const;
+		bool operator > (const LetObj& rhs) const;
+		bool operator >= (const LetObj& rhs) const;
+		bool operator <= (const LetObj& rhs) const;
+
+		int getCommonGround(const LetObj& rhs) const;
+
 		LetObj& operator = (int);
 		LetObj& operator = (bool);
 		LetObj& operator = (const char*);
@@ -81,6 +88,13 @@ private:
 		friend LetObj operator * (const LetObj& lhs, const LetObj& rhs);
 		friend LetObj operator / (const LetObj& lhs, const LetObj& rhs);
 		friend LetObj operator % (const LetObj& lhs, const LetObj& rhs);
+
+		void push(const LetObj& newObj);
+		int size() const noexcept;
+		LetObj pop();
+		LetObj shift();
+		void unshift(const LetObj& newObj);
+
 
 		static bool IsNullOrUndefined(const LetObj& rhs);
 };

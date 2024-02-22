@@ -22,9 +22,12 @@ enum class TokenType
 	NEWLINE,
 	PRINT,
 	COMMA,
-	KEYEQUAL,
+	COLON,
 	ENDL,
 	STR_LITERAL,
+	FOR,
+	IF,
+	ELSE,
 };
 
 struct Token

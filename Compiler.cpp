@@ -3,13 +3,15 @@
 #include <sstream>
 #include <cassert>
 #include <initializer_list>
+#include <exception>
 #include "Parser.h"
 
 
 int main(int argc, char** argv)
 {
+    LetObj x = 11;
+
     std::fstream sourceFile("./source.pp", std::ios_base::in);
-    std::fstream outputFile("./out.cpp", std::ios_base::out);
 
     std::stringstream contents;
     contents << sourceFile.rdbuf();
@@ -21,10 +23,17 @@ int main(int argc, char** argv)
     p.setTokens(lexer.tokenize(contents.str()));
     lexer.printTokens();
 
-    p.dumpCode("./out.cpp");
+    try {
+        p.dumpCode("./out.cpp");
+    }
+    catch (std::exception& e) {
+        std::cout << e.what();
+    }
+    catch (const char* msg) {
+        std::cout << msg;
+    }
 
     sourceFile.close();
-    outputFile.close();
 
     return 0;
 }

@@ -15,5 +15,7 @@ class Parser
 		bool Parse();
 		void setTokens(std::vector<Token> newTokens);
 		void dumpCode(const std::string& fileName);
+		bool hasToken(int pos);
+		Token peek(int pos);
 };
 

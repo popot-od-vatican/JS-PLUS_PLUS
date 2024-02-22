@@ -163,6 +163,108 @@ bool LetObj::operator==(const std::vector<LetObj>& rhs) const
 	return arr == rhs;
 }
 
+bool LetObj::operator<(const LetObj& rhs) const
+{
+	int type = getCommonGround(rhs);
+	if (type <= -1)
+		return false;
+	if (type == (int)State::ARRAY)
+		throw "Cannot compare two arrays with < operator!";
+
+	switch ((State)type)
+	{
+		case State::INT:
+			return integer < rhs.integer;
+		case State::BOOLEAN:
+			return boolean < rhs.boolean;
+		case State::STRING:
+			return std::string(buffer) < std::string(rhs.buffer);
+	}
+
+	return false;
+}
+
+bool LetObj::operator>(const LetObj& rhs) const
+{
+	int type = getCommonGround(rhs);
+	if (type <= -1)
+		return false;
+	if (type == (int)State::ARRAY)
+		throw "Cannot compare two arrays with > operator!";
+
+	switch ((State)type)
+	{
+	case State::INT:
+		return integer > rhs.integer;
+	case State::BOOLEAN:
+		return boolean > rhs.boolean;
+	case State::STRING:
+		return std::string(buffer) > std::string(rhs.buffer);
+	}
+
+	return false;
+}
+
+bool LetObj::operator>=(const LetObj& rhs) const
+{
+	int type = getCommonGround(rhs);
+	if (type <= -1)
+		return false;
+	if (type == (int)State::ARRAY)
+		throw "Cannot compare two arrays with >= operator!";
+
+	switch ((State)type)
+	{
+	case State::INT:
+		return integer >= rhs.integer;
+	case State::BOOLEAN:
+		return boolean >= rhs.boolean;
+	case State::STRING:
+		return std::string(buffer) >= std::string(rhs.buffer);
+	}
+
+	return false;
+}
+
+bool LetObj::operator<=(const LetObj& rhs) const
+{
+	int type = getCommonGround(rhs);
+	if (type <= -1)
+		return false;
+	if (type == (int)State::ARRAY)
+		throw "Cannot compare two arrays with <= operator!";
+
+	switch ((State)type)
+	{
+	case State::INT:
+		return integer <= rhs.integer;
+	case State::BOOLEAN:
+		return boolean <= rhs.boolean;
+	case State::STRING:
+		return std::string(buffer) <= std::string(rhs.buffer);
+	}
+
+	return false;
+}
+
+int LetObj::getCommonGround(const LetObj& rhs) const
+{
+	if (state == rhs.state)
+		return (int)state;
+	if (IsNullOrUndefined(*this) || IsNullOrUndefined(rhs))
+		return -1;
+	if ((state == State::STRING && rhs.state == State::ARRAY) || (state == State::ARRAY && rhs.state == State::STRING))
+		return -1;
+
+	if (state == State::STRING || rhs.state == State::STRING)
+		return 2;
+
+	if (state == State::ARRAY || rhs.state == State::ARRAY)
+		return -1;
+
+	return (int)State::INT;
+}
+
 LetObj& LetObj::operator=(int val)
 {
 	state = State::INT;
@@ -231,6 +333,50 @@ std::variant<LetObj, char> LetObj::operator[](int index)
 	}
 
 	throw "Cannot use the index operator on a non iterable type!";
+}
+
+void LetObj::push(const LetObj& newObj)
+{
+	if (state != State::ARRAY)
+		throw "Can't use push on something that isn't an array!";
+	arr.push_back(newObj);
+}
+
+int LetObj::size() const noexcept
+{
+	if (state == State::ARRAY)
+		return arr.size();
+	if (state == State::STRING)
+		return length;
+	return 0;
+}
+
+LetObj LetObj::pop()
+{
+	if (state != State::ARRAY)
+		throw "Cannot use pop on something that isn't an array!";
+
+	LetObj lastElement = arr.back();
+	arr.pop_back();
+	return lastElement;
+}
+
+LetObj LetObj::shift()
+{
+	if (state != State::ARRAY)
+		throw "Cannot use unshift on something that isn't and array!";
+
+	LetObj firstElement = arr.front();
+	arr.erase(arr.begin());
+	return firstElement;
+}
+
+void LetObj::unshift(const LetObj& newObj)
+{
+	if (state != State::ARRAY)
+		throw "Cannot use unshift on something that isn't and array!";
+
+	arr.insert(arr.begin(), newObj);
 }
 
 bool LetObj::IsNullOrUndefined(const LetObj& rhs)
